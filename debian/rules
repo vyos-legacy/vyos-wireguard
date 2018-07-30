@@ -7,19 +7,19 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 WIREGUARD_ARGS = WITH_BASHCOMPLETION=yes WITH_WGQUICK=yes WITH_SYSTEMDUNITS=yes
 
 %:
-	dh $@ --with dkms
+	dh $@
 
-override_dh_auto_install-indep:
-	$(MAKE) -C src DESTDIR=../debian/wireguard-dkms DKMSDIR=/usr/src/wireguard-$(DEB_VERSION)/ dkms-install
+override_dh_clean:
+	dh_clean -O--sourcedirectory=src
+
+override_dh_auto_clean:
+	dh_auto_clean -O--sourcedirectory=src
 
 override_dh_auto_build-arch:
-	dh_auto_build --sourcedirectory=src/tools -- $(WIREGUARD_ARGS)
+	dh_auto_build --sourcedirectory=src -- $(WIREGUARD_ARGS)
 
 override_dh_auto_install-arch:
 	$(MAKE) -C src/tools DESTDIR=../../debian/wireguard-tools $(WIREGUARD_ARGS) install
-
-override_dh_dkms:
-	dh_dkms -p wireguard-dkms -- src/dkms.conf
 
 override_dh_installchangelogs:
 	dh_installchangelogs debian/upstream.changelog

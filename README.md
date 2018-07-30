@@ -8,3 +8,7 @@ WireGuard is a novel VPN that runs inside the Linux Kernel and utilizes **state-
 ## License
 
 This project is released under the [GPLv2](COPYING).
+
+
+# Build for VyOS
+KERNELDIR=`<kernel build dir>` dpkg-buildpackage -uc -us -tc -b
