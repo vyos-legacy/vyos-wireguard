@@ -15,7 +15,7 @@
 # ││fd00::1/24         ││   │    │127.0.0.1:1   127.0.0.1:2│   │   ││fd00::2/24         ││
 # │└───────────────────┘│   │    │[::]:1        [::]:2     │   │   │└───────────────────┘│
 # └─────────────────────┘   │    └─────────────────────────┘   │   └─────────────────────┘
-#                           └──────────────────────────────────┘                          
+#                           └──────────────────────────────────┘
 #
 # After the topology is prepared we run a series of TCP/UDP iperf3 tests between the
 # wireguard peers in $ns1 and $ns2. Note that $ns0 is the endpoint for the wg0
@@ -437,6 +437,30 @@ done
 config+=( "[Peer]" "PublicKey=$(wg genkey)" "AllowedIPs=255.2.3.4/32,abcd::255/128" )
 n0 wg setconf wg0 <(printf '%s\n' "${config[@]}")
 n0 wg showconf wg0 > /dev/null
+ip0 link del wg0
+
+allowedips=( )
+for i in {1..197}; do
+        allowedips+=( abcd::$i )
+done
+saved_ifs="$IFS"
+IFS=,
+allowedips="${allowedips[*]}"
+IFS="$saved_ifs"
+ip0 link add wg0 type wireguard
+n0 wg set wg0 peer "$pub1"
+n0 wg set wg0 peer "$pub2" allowed-ips "$allowedips"
+{
+	read -r pub allowedips
+	[[ $pub == "$pub1" && $allowedips == "(none)" ]]
+	read -r pub allowedips
+	[[ $pub == "$pub2" ]]
+	i=0
+	for _ in $allowedips; do
+		((++i))
+	done
+	((i == 197))
+} < <(n0 wg show wg0 allowed-ips)
 ip0 link del wg0
 
 ! n0 wg show doesnotexist || false

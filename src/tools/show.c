@@ -1,5 +1,5 @@
-/* SPDX-License-Identifier: GPL-2.0
- *
+// SPDX-License-Identifier: GPL-2.0
+/*
  * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
  */
 
@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 #include <time.h>
 #include <netdb.h>
 
@@ -52,12 +53,12 @@ static void sort_peers(struct wgdevice *device)
 		++peer_count;
 	if (!peer_count)
 		return;
-	peers = calloc(peer_count, sizeof(struct wgpeer *));
+	peers = calloc(peer_count, sizeof(*peers));
 	if (!peers)
 		return;
 	for_each_wgpeer(device, peer)
 		peers[i++] = peer;
-	qsort(peers, peer_count, sizeof(struct wgpeer *), peer_cmp);
+	qsort(peers, peer_count, sizeof(*peers), peer_cmp);
 	device->first_peer = peers[0];
 	peers[0]->next_peer = NULL;
 	for (i = 1; i < peer_count; ++i) {
@@ -394,12 +395,13 @@ int show_main(int argc, char *argv[])
 			perror("Unable to list interfaces");
 			return 1;
 		}
+		ret = !!*interfaces;
 		interface = interfaces;
 		for (size_t len = 0; (len = strlen(interface)); interface += len + 1) {
 			struct wgdevice *device = NULL;
 
 			if (ipc_get_device(&device, interface) < 0) {
-				perror("Unable to access interface");
+				fprintf(stderr, "Unable to access interface %s: %s\n", interface, strerror(errno));
 				continue;
 			}
 			if (argc == 3) {
@@ -414,6 +416,7 @@ int show_main(int argc, char *argv[])
 					printf("\n");
 			}
 			free_wgdevice(device);
+			ret = 0;
 		}
 		free(interfaces);
 	} else if (!strcmp(argv[1], "interfaces")) {

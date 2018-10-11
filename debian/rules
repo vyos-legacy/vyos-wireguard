@@ -3,6 +3,7 @@
 include /usr/share/dpkg/default.mk
 
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+export DEB_VERSION_UPSTREAM
 
 WIREGUARD_ARGS = WITH_BASHCOMPLETION=yes WITH_WGQUICK=yes WITH_SYSTEMDUNITS=yes
 
@@ -23,3 +24,6 @@ override_dh_auto_install-arch:
 
 override_dh_installchangelogs:
 	dh_installchangelogs debian/upstream.changelog
+
+override_dh_fixperms:
+	dh_fixperms -Xetc/wireguard
