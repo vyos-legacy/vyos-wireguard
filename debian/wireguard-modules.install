@@ -1,1 +1,1 @@
-src/wireguard.ko /lib/modules/4.18.11-amd64-vyos/extra
+src/wireguard.ko /lib/modules/4.14.75-amd64-vyos/extra
