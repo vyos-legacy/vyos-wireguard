@@ -7,16 +7,15 @@ Build-Depends:
  libmnl-dev,
  pkg-config,
  systemd,
-Standards-Version: 4.2.1
+Standards-Version: 4.3.0
 Homepage: https://www.wireguard.com
 Vcs-Git: https://salsa.debian.org/debian/wireguard.git
 Vcs-Browser: https://salsa.debian.org/debian/wireguard
-Rules-Requires-Root: no
 
 Package: wireguard
 Architecture: all
 Depends:
- wireguard-tools (>= 0.0.20171001),
+ wireguard-tools (>= ${source:Version}),
  ${misc:Depends},
 Description: fast, modern, secure kernel VPN tunnel (metapackage)
  WireGuard is a novel VPN that runs inside the Linux Kernel and uses
@@ -28,7 +27,8 @@ Description: fast, modern, secure kernel VPN tunnel (metapackage)
  many different circumstances. It runs over UDP.
  .
  This metapackage explicitly depends on both the kernel module and the
- userspace tooling.
+ userspace tooling, and tries to load the new kernel module upon
+ installation, if wireguard is already in use on the system.
 
 Package: wireguard-tools
 Architecture: linux-any

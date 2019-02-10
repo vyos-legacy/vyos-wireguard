@@ -1,13 +1,13 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 #
-# Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
+# Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
 
 shopt -s globstar
 
 WG="$(readlink -f "$(dirname "$(readlink -f "$0")")/../../src/")"
 
-for i in "$WG"/**/{*.c,*.h,*.S,*.S_shipped,*.include} "$WG/Kbuild" "$WG/Kconfig"; do
+for i in "$WG"/**/{*.c,*.h,*.S,*.pl,*.include} "$WG/Kbuild" "$WG/Kconfig"; do
 	[[ $i == "$WG/tools/"* || $i == "$WG/tests/"* ]] && continue
 	diff -u /dev/null "$i" | sed "s:${WG}:b/net/wireguard:;s:Kbuild:Makefile:"
 done
